@@ -2,7 +2,7 @@
 
 ## Usage:
 ### Fibaro HC3
-- import QuickApp
+- import QuickApp (Luftdaten.fqa)
 - set requred variable:
   - *sensorIp* - IP of your local Luftdaten sensor
 - optional variables:
