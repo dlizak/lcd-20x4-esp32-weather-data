@@ -10,6 +10,6 @@
   - *interval* (default: 145)
   - *lcdIp* - ip of your ESP32 with LCD
 
-### ESP32 with LCD and BME280 sensor:
+### ESP32 with LCD and BME280 sensor (optional):
 - edit variables in .ino file with your WiFi SSID and password, enter NTP server address
 - upload sketch to ESP32
