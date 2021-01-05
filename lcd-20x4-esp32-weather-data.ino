@@ -7,6 +7,7 @@
 
 const char* ssid = "YOUR_SSID";
 const char* password = "YOUR_PASSWORD";
+const char* ntpServer = "YOUR_NTP_SERVER_ADDRESS";
 
 byte CharTemperature[8] = {0b00100, 0b11010, 0b01010, 0b11010, 0b01010, 0b11111, 0b11111, 0b01110};
 byte CharHumidity[8] = {0b00100, 0b01010, 0b01010, 0b10001, 0b10001, 0b10001, 0b01110, 0b00000};
@@ -99,7 +100,7 @@ void loop() {
 }
 
 void setupDateTime() {
-  DateTime.setServer("192.168.1.1");
+  DateTime.setServer(ntpServer);
   DateTime.setTimeZone(1);
   DateTime.begin();
   if (!DateTime.isTimeValid()) {
@@ -117,9 +118,9 @@ void updateLocalData() {
 
 void updateWeatherData() {
   msWeatherData = millis();
-  temperature = server.arg("BME280_temperature");
-  humidity = server.arg("BME280_humidity");
-  pressure = server.arg("BME280_pressure");
+  temperature = server.arg("temperature");
+  humidity = server.arg("humidity");
+  pressure = server.arg("pressure");
   aqi = server.arg("aqi");
   server.send(200, "text/html");
 }
@@ -128,7 +129,7 @@ void updateDisplay() {
   time_t t = DateTime.now();
   DateTimeParts timeParts = DateTime.getParts();
   const char* dateFormat = t % 2 == 0 ? "%H %M" : "%H:%M";
-  String date_str = string_asukiaaa::padEnd((String)weekDays[timeParts.getWeekDay()] + ", " + (String)timeParts.getMonthDay() + " " + (String)months[timeParts.getMonth()], 12, ' ');
+  String date_str = string_asukiaaa::padStart((String)weekDays[timeParts.getWeekDay()] + ", " + (String)timeParts.getMonthDay() + " " + (String)months[timeParts.getMonth()], 13, ' ');
   String temperature_str = string_asukiaaa::padEnd(" " + (temperature != "" ? roundAndStrip(temperature) + (char)223 + "C" : "n/a"), 9, ' ');
   String localTemperature_str = string_asukiaaa::padEnd(" " + roundAndStrip(localTemperature) + (char)223 + "C", 9, ' ');
   String humidity_str = string_asukiaaa::padEnd(" " + (humidity != "" ? roundAndStrip(humidity) + "%" : "n/a"), 7, ' ');
@@ -138,7 +139,7 @@ void updateDisplay() {
   const boolean communicationError = millis() - msWeatherData > 5 * 60 * 1000;
 
   lcd.setCursor(0,0);
-  lcd.print(" " + DateFormatter::format(dateFormat, t) + "  " + date_str);
+  lcd.print(" " + DateFormatter::format(dateFormat, t) + " " + date_str);
 
   if (communicationError) {
     lcd.setCursor(0,1);
@@ -146,7 +147,7 @@ void updateDisplay() {
     lcd.setCursor(0,2);
     lcd.print("   z komunikacja    ");
   } else {
-    if (temperature != "" && humidity != "" & aqi != "") {
+    if (temperature != "" && humidity != "" && aqi != "") {
       lcd.setCursor(0,1);
       lcd.print(aqi_str);
       lcd.print(pressure_str);
